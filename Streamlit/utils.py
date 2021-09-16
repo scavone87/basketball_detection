@@ -13,21 +13,21 @@ def draw_points(img, points):
         cv.circle(img, (x,y), 5, (0,255,0), 7)
     return img
 
-def get_plan_view(src, dst, src_list, dst_list):
+def get_plan_view(src, dst, src_list, dst_list, fileNameHMatrix):
     src_pts = np.array(src_list).reshape(-1, 1, 2)
     dst_pts = np.array(dst_list).reshape(-1, 1, 2)
     H, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 5.0)
     print("H:")
     print(H)
-    f = open('homography.txt', 'w')
+    f = open(fileNameHMatrix + ".txt", 'w')
     f.write("Final homography: \n" + str(H)+"\n")
     f.close()
     plan_view = cv.warpPerspective(src, H, (dst.shape[1], dst.shape[0]))
     return plan_view
 
 
-def merge_views(src, dst, src_list, dst_list):
-    plan_view = get_plan_view(src, dst, src_list, dst_list)
+def merge_views(src, dst, src_list, dst_list, fileNameHMatrix):
+    plan_view = get_plan_view(src, dst, src_list, dst_list, fileNameHMatrix)
     for i in range(0, dst.shape[0]):
         for j in range(0, dst.shape[1]):
             if(plan_view.item(i, j, 0) == 0 and

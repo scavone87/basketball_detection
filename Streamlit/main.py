@@ -1,11 +1,11 @@
 import streamlit as st
-import pre_elaborazione
 import homography
+import stitching
 
 
 PAGES = {
-    "Pre Elaborazione": pre_elaborazione,
-    "Omografie": homography
+    "Stitching": stitching,
+    "Omografia": homography
 }
 st.sidebar.title('Navigazione')
 selection = st.sidebar.radio("vai", list(PAGES.keys()))
