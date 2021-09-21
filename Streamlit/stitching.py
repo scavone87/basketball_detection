@@ -19,7 +19,7 @@ def app():
     with matlab_section:
         st.code(MATLAB_STITCHING, language='MATLAB')
         st.markdown(utils.get_binary_file_downloader_html(
-            PATH_SCRIPTS + 'stitching.m', 'Code'), unsafe_allow_html=True)
+            PATH_SCRIPTS + 'stitching_matlab.m', 'Code'), unsafe_allow_html=True)
 
     python_section = st.expander(label='Python')
     with python_section:

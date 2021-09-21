@@ -1,66 +1,65 @@
-clear;
-clc;
+% Pulizia del workspace e delle variabili
+clear
+clc
 
-% Load images.
+% Caricamento delle immagini
 buildingDir = fullfile('Inserire il path della cartella contenente i frame per lo stitching');
 buildingScene = imageDatastore(buildingDir);
 
-% Display images to be stitched.
-montage(buildingScene.Files)
+% Stampa delle immagini che verranno usate per lo stitching
+%montage(buildingScene.Files)
 
-% Read the first image from the image set.
+% Lettura della prima immagine dell'image set
 I = readimage(buildingScene,1);
 
-% Initialize features for I(1)
+% Inizializzazione delle features
 grayImage = im2gray(I);
 points = detectSURFFeatures(grayImage);
 [features, points] = extractFeatures(grayImage,points);
 
-% Initialize all the transforms to the identity matrix. Note that the
-% projective transform is used here because the building images are fairly
-% close to the camera. Had the scene been captured from a further distance,
-% an affine transform would suffice.
+% Inizializza tutte le trasformazioni alla matrice identità
 numImages = numel(buildingScene.Files);
 tforms(numImages) = projective2d(eye(3));
 
-% Initialize variable to hold image sizes.
+% Inizializzazione delle variabili per mantenere le dimensioni
+% dell'immagine
 imageSize = zeros(numImages,2);
 
-% Iterate over remaining image pairs
+% Iterazione, a coppie di due, sulle immagini restanti
 for n = 2:numImages
     
-    % Store points and features for I(n-1).
+    % Memorizzazione dei punti e delle features
     pointsPrevious = points;
     featuresPrevious = features;
         
-    % Read I(n).
+    % Lettura dell'immagine n
     I = readimage(buildingScene, n);
     
-    % Convert image to grayscale.
+    % Conversione dell'immagine in scala di grigi
     grayImage = im2gray(I);    
     
-    % Save image size.
+    % Salvataggio delle misure dell'immagine
     imageSize(n,:) = size(grayImage);
     
-    % Detect and extract SURF features for I(n).
+    % Riconoscimento ed estrazione delle features per applicare SURF all'immagine n
     points = detectSURFFeatures(grayImage);    
     [features, points] = extractFeatures(grayImage, points);
   
-    % Find correspondences between I(n) and I(n-1).
+    % Ricerca delle corrispondenze tra l'immagine n e l'immagine n-1
     indexPairs = matchFeatures(features, featuresPrevious, 'Unique', true);
        
     matchedPoints = points(indexPairs(:,1), :);
     matchedPointsPrev = pointsPrevious(indexPairs(:,2), :);        
     
-    % Estimate the transformation between I(n) and I(n-1).
+    % Stima della trasformazione tra l'immagine n e l'immagine n-1
     tforms(n) = estimateGeometricTransform2D(matchedPoints, matchedPointsPrev,...
         'projective', 'Confidence', 99.9, 'MaxNumTrials', 2000);
     
-    % Compute T(n) * T(n-1) * ... * T(1)
+    % Calcolo T(n) * T(n-1) * ... * T(1)
     tforms(n).T = tforms(n).T * tforms(n-1).T; 
 end
 
-% Compute the output limits for each transform.
+% Calcolo dei bordi per ogni trasformazione in output
 for i = 1:numel(tforms)           
     [xlim(i,:), ylim(i,:)] = outputLimits(tforms(i), [1 imageSize(i,2)], [1 imageSize(i,1)]);    
 end
@@ -81,42 +80,42 @@ end
 
 maxImageSize = max(imageSize);
 
-% Find the minimum and maximum output limits. 
+% Ricerca del minimo e del massimo inerente ai bordi dell'output 
 xMin = min([1; xlim(:)]);
 xMax = max([maxImageSize(2); xlim(:)]);
 
 yMin = min([1; ylim(:)]);
 yMax = max([maxImageSize(1); ylim(:)]);
 
-% Width and height of panorama.
+% Larghezza e altezza dell'immagine panoramica ottenuta
 width  = round(xMax - xMin);
 height = round(yMax - yMin);
 
-% Initialize the "empty" panorama.
+% Inizializzazione dell'immagine panoramica "vuota"
 panorama = zeros([height width 3], 'like', I);
 
 blender = vision.AlphaBlender('Operation', 'Binary mask', ...
     'MaskSource', 'Input port');  
 
-% Create a 2-D spatial reference object defining the size of the panorama.
+% Creazione di un oggetto 2D con le misure prima definite
 xLimits = [xMin xMax];
 yLimits = [yMin yMax];
 panoramaView = imref2d([height width], xLimits, yLimits);
 
-% Create the panorama.
+% Creazione dell'immagine panoramica
 for i = 1:numImages
     
     I = readimage(buildingScene, i);   
    
-    % Transform I into the panorama.
+    % Trasformazione dell'immagine i nell'immagine panoramica
     warpedImage = imwarp(I, tforms(i), 'OutputView', panoramaView);
                   
-    % Generate a binary mask.    
+    % Creazione di una maschera binaria    
     mask = imwarp(true(size(I,1),size(I,2)), tforms(i), 'OutputView', panoramaView);
     
-    % Overlay the warpedImage onto the panorama.
+    % Sovrapposizione dell'immagine elaborata al panorama
     panorama = step(blender, panorama, warpedImage, mask);
 end
 
-figure
+figure('Name','Immagine paronamica ottenuta','NumberTitle','off', 'Color','black');
 imshow(panorama)
