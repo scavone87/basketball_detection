@@ -20,15 +20,19 @@ def app():
     col2.video(video_bytes_oklahoma)
     
     st.write('''
-    Le clip sono state registrate dal videogame NBA2K21 e sono stati estratti dei frame utilizzando uno script python in grado di estrarre un frame per ogni secondo. Di seguito il codice:
+    Per questo progetto sono stati utilizzati frame estratti dal videogame NBA2K21 oltre a immagini provenienti da partite reali, entrambi ricavati mediante uno script
+    python, che permette di ottenere un frame per ogni secondo della clip.
+
+
+    Di seguito il codice:
     ''')
 
     my_expander = st.expander(label='CLick to show code')
     with my_expander:
       st.code(FRAME_EXTRACTOR, language= 'python')
+      st.write("**NOTA**: Il ritardo con cui estrapolare i frame può essere modificato opportunamente alla seguente riga di codice `vidcap.set(cv2.CAP_PROP_POS_MSEC,(count*delay_in_milliseconds))`")
       st.markdown(utils.get_binary_file_downloader_html(PATH_SCRIPTS + 'frame_extractor.py', 'Code'), unsafe_allow_html=True)
 
-    
     real = cv2.imread(PATH_IMGS_EXAMPLE + "/real.jpg")
     game = cv2.imread(PATH_IMGS_EXAMPLE + "/game.jpg")
     real1 = cv2.imread(PATH_IMGS_EXAMPLE + "/real1.jpg")
@@ -36,6 +40,7 @@ def app():
     real2 = cv2.imread(PATH_IMGS_EXAMPLE + "/real2.png")
     game2 = cv2.imread(PATH_IMGS_EXAMPLE + "/game2.jpg")
 
+    st.subheader("Alcuni frame estratti")
     st.image(real, channels='BGR', caption="TD Garden (Boston)")
     st.image(real1, channels= 'BGR', caption="Staples Center - Lakers (Los Angeles)")
     st.image(real2, channels='BGR', caption="Mediolanum Forum (Milano)")
@@ -47,7 +52,6 @@ def app():
     st.write(
     '''Risulta chiara, dagli esempi sopra presentati, la presenza di watermark.
        Questi ultimi sono stati rimossi in una fase di pre-elaborazione delle immagini per garantire una migliore riuscita dello stitching.
-       (VALUTARE SE LASCIARE O MENO)
     ''')
 
     watermark = cv2.imread(PATH_IMGS_EXAMPLE + "/watermark.jpg")

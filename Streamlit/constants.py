@@ -5,6 +5,13 @@ PATH_LA = "stitching/Lakers/"
 PATH_OKC = "stitching/Oklahoma/"
 PATH_IMGS = "homography/imgs/"
 
+PATH_VISUALE_1 = "homography/visuale1"
+PATH_VISUALE_2 = "homography/visuale2"
+
+
+H_MATRIX_1 = "homography_1.txt"
+H_MATRIX_2 = "homography_2.txt"
+
 
 FRAME_EXTRACTOR = '''
 import sys
