@@ -2,16 +2,44 @@ import streamlit as st
 import numpy as np
 import imageio
 import imutils
+import glob
 import cv2
 from constants import PATH_IMGS
 
 feature_extractors = ['sift', 'surf', 'brisk', 'orb']
 feature_matchings = ['knn', 'bf']
 
+src_dict = {
+    'Lakers 1': PATH_IMGS + 'src1.jpg',
+    'Lakers 2': PATH_IMGS + 'src2.jpg',
+    'Oklahoma 1': PATH_IMGS + 'src3.jpg',
+    'Oklahoma 2': PATH_IMGS + 'src4.jpg'
+}
+
+dst_dict = {
+    'Lakers 2D': PATH_IMGS + 'dst.jpg',
+    'Oklahoma 2D': PATH_IMGS + 'dst2.jpg'
+}
+
 
 def app():
 
     st.title("Omografia interattiva")
+
+    st.markdown('''
+    <div text-align="justify"> La seguente pagina consente di applicare gli algoritmi di feature extractor e di feature matching per ottenere una mappatura sul campo 2D
+    attraverso il calcolo della matrice di omografia. Questo modulo vuole dimostrare che i classici algoritmi possono funzionare bene quando l'immagine di source è esente da 
+    elementi disturbatori come i giocatori ed il pubblico ma funziona molto male con immagini realistiche</div> 
+    <br>
+    <div text-align="justify"> Con le immagini <b>Lakers 1</b> e <b>Lakers 2D</b>, utilizzando <b>sift</b> con <b>bf</b> e scegliendo come <b>Reprojection threshold</b> 10
+    si ottiene un buon risultato </div><br>
+    ''', unsafe_allow_html= True)
+
+    current_src = st.selectbox("Seleziona un'immagine di source", src_dict.keys())
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    current_dst = st.selectbox("Seleziona un'immagine di destination", dst_dict.keys())
+    st.markdown("<br>", unsafe_allow_html=True)
 
     feature_extractor = st.selectbox(
         "Seleziona l'algoritmo di feature extractor",
@@ -22,10 +50,15 @@ def app():
         "Seleziona l'algoritmo di feature matching",
         feature_matchings
     )
+    
+    if current_dst == 'Lakers 2D':
+        queryImg = cv2.imread(PATH_IMGS + 'dst.jpg')
+    else:
+        queryImg = cv2.imread(PATH_IMGS + 'dst2.jpg')
 
-    trainImg = cv2.imread(PATH_IMGS + 'src1.jpg')
+    trainImg = cv2.imread(src_dict[current_src])   
     trainImg_gray = cv2.cvtColor(trainImg, cv2.COLOR_RGB2GRAY)
-    queryImg = cv2.imread(PATH_IMGS + 'dst.jpg')
+    queryImg = cv2.imread(dst_dict[current_dst])
     queryImg_gray = cv2.cvtColor(queryImg, cv2.COLOR_RGB2GRAY)
 
     st.image(trainImg, channels="BGR",
@@ -50,7 +83,7 @@ def app():
 
     st.image(img3, channels="BGR", caption="First 100 matching of key points")
 
-    reprojThresh = st.slider("Ransac Reprojection threshold", min_value=1, max_value=100, step=1)
+    reprojThresh = st.slider("Ransac Reprojection threshold", min_value=1.0, max_value=10.0, step=0.5)
     M = getHomography(kpsA, kpsB, featuresA, featuresB, matches, reprojThresh=reprojThresh)
     if M is None:
         st.error("Errore! Numero di matching non sufficienti per ricavare la matrice H")
@@ -67,6 +100,8 @@ def app():
                 plan_view.itemset((i,j,2),queryImg.item(i,j,2))
 
     st.image(plan_view, channels="BGR", caption = "Homography")
+
+
 
 
 def detectAndDescribe(image, method=None):
