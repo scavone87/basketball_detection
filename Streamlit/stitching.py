@@ -33,7 +33,7 @@ def app():
         '''Di seguito due esempi di stitching, con immagini estratte dal videogioco NBA2K21.
     ''')
 
-    st.header("ESEMPIO 1: Staples Center Lakers senza giocatori")
+    st.subheader("ESEMPIO 1: Staples Center Lakers senza giocatori")
 
     framesx = cv2.imread(PATH_LA + "/1.jpg")
     framec = cv2.imread(PATH_LA + "/2.jpg")
@@ -51,7 +51,7 @@ def app():
 
     st.markdown("---")
 
-    st.header("ESEMPIO 2: Chesapeake Energy Arena Oklahoma con giocatori")
+    st.subheader("ESEMPIO 2: Chesapeake Energy Arena Oklahoma con giocatori")
 
     framesx1 = cv2.imread(PATH_OKC + "/1.jpg")
     framec1 = cv2.imread(PATH_OKC + "/2.jpg")

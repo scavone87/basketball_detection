@@ -49,6 +49,8 @@ def app():
     st.image(game2, channels= 'BGR', caption="Scotiabank Arena (Toronto) da NBA2K21")
 
     st.markdown("---")
+
+    st.subheader("Nota")
     st.write(
     '''Risulta chiara, dagli esempi sopra presentati, la presenza di watermark.
        Questi ultimi sono stati rimossi in una fase di pre-elaborazione delle immagini per garantire una migliore riuscita dello stitching.
