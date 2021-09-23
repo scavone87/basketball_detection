@@ -6,7 +6,7 @@ import glob
 import cv2
 from constants import PATH_IMGS
 
-feature_extractors = ['sift', 'surf', 'brisk', 'orb']
+feature_extractors = ['sift', 'brisk', 'orb']
 feature_matchings = ['knn', 'bf']
 
 src_dict = {
@@ -113,9 +113,7 @@ def detectAndDescribe(image, method=None):
 
     # rilevare ed estrarre le caratteristiche dall'immagine
     if method == 'sift':
-        descriptor=cv2.xfeatures2d.SIFT_create()
-    elif method == 'surf':
-        descriptor=cv2.xfeatures2d.SURF_create()
+        descriptor=cv2.SIFT_create()
     elif method == 'brisk':
         descriptor=cv2.BRISK_create()
     elif method == 'orb':

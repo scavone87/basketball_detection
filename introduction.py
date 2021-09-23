@@ -26,7 +26,7 @@ def app():
     Di seguito il codice:
     ''', unsafe_allow_html= True)
 
-    my_expander = st.expander(label='CLick to show code')
+    my_expander = st.expander(label='Click to show code')
     with my_expander:
       st.code(FRAME_EXTRACTOR, language= 'python')
       st.write("**NOTA**: Il ritardo con cui estrapolare i frame può essere modificato opportunamente alla seguente riga di codice `vidcap.set(cv2.CAP_PROP_POS_MSEC,(count*delay_in_milliseconds))`")
