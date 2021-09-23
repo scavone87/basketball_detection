@@ -12,7 +12,7 @@ def app():
     st.markdown('''<div style="text-align: justify">
     Al fine di ottenere l'omografia di un intero campo da gioco, i frames estratti sono stati uniti grazie alla
     tecnica dello 'stitching'. Per effettuare lo stitching sono stati sviluppati due script: uno utilizzando Python con OpenCV e
-	l'altro sviluppato in MATLAB.</div>
+	l'altro sviluppato in MATLAB.</div> <br>
     ''', unsafe_allow_html= True)
 
     matlab_section = st.expander(label='MATLAB')
