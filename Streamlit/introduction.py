@@ -19,13 +19,12 @@ def app():
     col1.video(video_bytes_lakers)
     col2.video(video_bytes_oklahoma)
     
-    st.write('''
+    st.markdown('''<div style="text-align: justify">
     Per questo progetto sono stati utilizzati frame estratti dal videogame NBA2K21 oltre a immagini provenienti da partite reali, entrambi ricavati mediante uno script
-    python, che permette di ottenere un frame per ogni secondo della clip.
-
-
+    python, che permette di ottenere un frame per ogni secondo della clip. </div>
+    <br>
     Di seguito il codice:
-    ''')
+    ''', unsafe_allow_html= True)
 
     my_expander = st.expander(label='CLick to show code')
     with my_expander:

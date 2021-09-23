@@ -27,11 +27,11 @@ def app():
     st.title("Omografia interattiva")
 
     st.markdown('''
-    <div text-align="justify"> La seguente pagina consente di applicare gli algoritmi di feature extractor e di feature matching per ottenere una mappatura sul campo 2D
-    attraverso il calcolo della matrice di omografia. Questo modulo vuole dimostrare che i classici algoritmi possono funzionare bene quando l'immagine di source è esente da 
-    elementi disturbatori come i giocatori ed il pubblico ma funziona molto male con immagini realistiche</div> 
+    <div style="text-align: justify"> La seguente pagina consente di applicare gli algoritmi di feature extractor e di feature matching per ottenere una mappatura sul campo 2D
+    attraverso il calcolo della matrice di omografia. Questo modulo vuole dimostrare che i classici algoritmi possono funzionare bene quando l'immagine di source è molto 
+    simile se non uguale all'immagine di destinazione.</div> 
     <br>
-    <div text-align="justify"> Con le immagini <b>Lakers 1</b> e <b>Lakers 2D</b>, utilizzando <b>sift</b> con <b>bf</b> e scegliendo come <b>Reprojection threshold</b> 10
+    <div style="text-align: justify"> Con le immagini <b>Lakers 1</b> e <b>Lakers 2D</b>, utilizzando <b>sift</b> con <b>bf</b> e scegliendo come <b>Reprojection threshold</b> 10
     si ottiene un buon risultato </div><br>
     ''', unsafe_allow_html= True)
 

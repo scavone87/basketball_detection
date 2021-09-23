@@ -9,11 +9,11 @@ def app():
 
     st.title("Stitching")
 
-    st.write(
-        '''Al fine di ottenere l'omografia di un intero campo da gioco, i frames estratti sono stati uniti grazie alla
-       tecnica dello 'stitching'. Per effettuare lo stitching sono stati sviluppati due script: uno utilizzando Python con OpenCV e
-	   l'altro sviluppato in MATLAB.
-    ''')
+    st.markdown('''<div style="text-align: justify">
+    Al fine di ottenere l'omografia di un intero campo da gioco, i frames estratti sono stati uniti grazie alla
+    tecnica dello 'stitching'. Per effettuare lo stitching sono stati sviluppati due script: uno utilizzando Python con OpenCV e
+	l'altro sviluppato in MATLAB.</div>
+    ''', unsafe_allow_html= True)
 
     matlab_section = st.expander(label='MATLAB')
     with matlab_section:
@@ -69,5 +69,6 @@ def app():
 
     st.markdown("---")
 
-    st.write('''Come è possibile vedere dai seguenti risulati,  **MATLAB** produce un'immagine meno distorta ed in generale **migliore**. 
-	Perciò da questo punto in avanti sono stati utilizzati solo stitching prodotti dallo script MATLAB''')
+    st.markdown('''<div style="text-align: justify">
+    Come è possibile vedere dai seguenti risulati,  <b>MATLAB</b> produce un'immagine meno distorta ed in generale <b>migliore</b>. 
+	Perciò da questo punto in avanti sono stati utilizzati solo stitching prodotti dallo script MATLAB </div>''', unsafe_allow_html= True)

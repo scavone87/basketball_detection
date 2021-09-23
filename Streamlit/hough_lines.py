@@ -47,14 +47,20 @@ quadrants_dict = {
 }'''
 
 
+images_dict = {
+  'Con giocatori': PATH_IMGS + "src_hough.jpg",
+  'Con giocatori + mask': PATH_IMGS + "pills_src.png",
+  'Senza giocatori': PATH_IMGS + "src1.jpg"
+}
+
 def app():
     st.title("Omografia con linee di Hough")
     
-    st.markdown('''<div text-align="justify"> In questo modulo è stata utilizzata una strategia che prevede l'utilizzo della trasformata di Hough.
+    st.markdown('''<div style="text-align: justify"> In questo modulo è stata utilizzata una strategia che prevede l'utilizzo della trasformata di Hough.
     E’ una tecnica che permette di riconoscere particolari configurazioni di punti presenti nell’immagine, come segmenti, curve o altre forme prefissate.
     Il principio fondamentale è che la forma cercata può essere espressa tramite una funzione nota che fa uso di un insieme di parametri. </div>
     <br> 
-    <div text-align="justify"> Nel caso del nostro progetto, l'obiettivo è quello di sfruttare la trasformata per ottenere delle linee le cui intersezioni restituiscono
+    <div style="text-align: justify"> Nel caso del nostro progetto, l'obiettivo è quello di sfruttare la trasformata per ottenere delle linee le cui intersezioni restituiscano
     dei punti candidati ad essere utilizzati per il calcolo dell'omografia. 
     </div>
     ''', unsafe_allow_html=True)
@@ -74,15 +80,16 @@ def app():
         st.image(dst_copy, channels="BGR")
         color_single_pixel(dst, points)
         cv2.imwrite(PATH_IMGS + 'final_dst.png', dst)
-        st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni, potrebbe rilanciare un'eccezione se queste non vengono trovate")
+        st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe rilanciare un'eccezione se queste non vengono trovate")
         
 
 
     st.subheader("Linee di Hough su Immagine di Source")
-    src = cv2.imread(PATH_IMGS + 'src_hough.jpg', cv2.IMREAD_COLOR)
-    src_copy = src.copy() 
-
+    
     with st.form(key='hough_src'):
+        scelta = st.selectbox("Scegli un'immagine", images_dict.keys())
+        src = cv2.imread(images_dict[scelta], cv2.IMREAD_COLOR)
+        src_copy = src.copy() 
         threshold= st.slider("Threshold", min_value=10, max_value=400, value=150, step=5, key="t2")
         minLineLength=st.slider("Min Line Length", min_value=10, max_value=400, value=50, step=5, key="min2")
         maxLineGap=st.slider("Max Line Gap", min_value=10, max_value=400, value=40, step=5, key="max2")
@@ -92,19 +99,20 @@ def app():
         st.image(src_copy, channels="BGR")
         color_single_pixel(src, src_points)
         cv2.imwrite(PATH_IMGS + 'final_src.png', src)
-        st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni, potrebbe rilanciare un'eccezione se queste non vengono trovate")
+        st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe rilanciare un'eccezione se queste non vengono trovate")
 
 
 
     st.subheader("Divisione immagini in griglie")   
     st.markdown('''
-    <div text-align="justify"> Come è possibile notare dai risultati ottenuti, è molto difficile riuscire ad ottenere gli stessi punti su entrambe le immagini.
+    <div style="text-align: justify"> Come è possibile notare, è molto difficile riuscire ad ottenere gli stessi punti su entrambe le immagini.
     Anche nel caso in cui si trovino punti in comune,  si avrebbe un numero di punti differenti tra le due immagini, rendendo impossibile il matching tra di essi. 
     Quindi, la strategia adottata è quella di dividere le immagini in 9 settori mediante una griglia, analizzare un settore per volta e scegliere per ognuno di essi un punto trovato mediante euristica 
+    (media).
     </div> <br>
     ''', unsafe_allow_html= True)
 
-    grid_src = cv2.imread(PATH_IMGS + "src_grid.jpg")
+    grid_src = draw_grid(src.copy())
     grid_dst = cv2.imread(PATH_IMGS + "dst_grid.jpg")
     
 
@@ -125,8 +133,6 @@ def app():
         par_img2 = list_value[1]  
         p_im1 = find_points(image1, int(x * par_img1[0]), int(x*par_img1[1]), int(y* par_img1[2]), int(y*par_img1[3]))
         p_im2 = find_points(image2, int(x1 * par_img2[0]), int(x1*par_img2[1]), int(y1* par_img2[2]), int(y1*par_img2[3]))
-        #col1.image(image1.crop((int(x * par_img1[0]), int(y* par_img1[2]), int(x*par_img1[1]), int(y*par_img1[3]))), channels = "BGR")
-        #col2.image(image2.crop((int(x1 * par_img2[0]), int(y1* par_img2[2]), int(x1*par_img2[1]), int(y1*par_img2[3]))), channels = "BGR")
         if p_im1 != None and p_im2 != None:
             print(int(p_im1[0]))
             cv2.circle(grid_dst, (int(p_im1[0]), int(p_im1[1])), 1, (255,127,0), 12)
@@ -136,9 +142,10 @@ def app():
     print(f'Points Image 1: {points_img1} \n Length: {len(points_img1)}')
     print(f'Points Image 2: {points_img2} \n Length: {len(points_img2)}')
     
-    st.image(grid_src, channels = "BGR")
+    st.image(grid_src, channels = "BGR", caption="La griglia è stata costruita in modo da avere rettangoli bassi in alto e rettangoli alti in basso per via della prospettiva")
     st.image(grid_dst, channels = "BGR")
 
+    st.subheader("Risultato")
     
     scelta = st.radio("Utilizzo del RANSAC per gli outliers", ['Si', 'No'], index=1)
 
@@ -156,7 +163,6 @@ def app():
                 plan_view.itemset((i,j,2),dst.item(i,j,2))
 
     st.image(plan_view, channels="BGR")
-
 
 
 
@@ -252,3 +258,15 @@ def find_points(img, x1, x2, y1, y2):
   list_points = np.array(points)
   mean_points = mean(list_points)
   return mean_points
+
+def draw_grid(img):
+  width = img.shape[1]
+  height = img.shape[0]
+  for x in range(0, width, int(width/3)):
+    cv2.line(img, (x, 0), (x, height), (0, 255, 0), thickness=  3)
+  cv2.line(img, (0,0), (width, 0),(0, 255, 0), thickness = 3)
+  cv2.line(img, (0,height), (width, height),(0, 255, 0), thickness=  3)
+  cv2.line(img, (0, int(height/4)), (width, int(height/4)),(0, 255, 0), thickness=  3)
+  cv2.line(img, (0, int(height*3/5)), (width, int(height*3/5)),(0, 255, 0), thickness=  3)
+  cv2.line(img, (0, height), (width, height),(0, 255, 0), thickness=  3)
+  return img
