@@ -23,6 +23,18 @@ import poly_point_isect as bot
 }'''
 
 quadrants_dict = {
+    'Quadrante 1:1': [[0, 1/3, 0, 1/3],[0, 1/3, 0, 1/4]],
+    'Quadrante 1:2': [[1/3, 2/3, 0, 1/3], [1/3, 2/3, 0, 1/4]],
+    'Quadrante 1:3': [[2/3, 1, 0, 1/3], [2/3, 1, 0, 1/4]],
+    'Quadrante 2:1': [[0, 1/3, 1/3, 2/3], [0, 1/3, 1/4, 3/5]],
+    'Quadrante 2:2': [[1/3, 2/3, 1/3, 2/3], [1/3, 2/3, 1/4, 3/5]],
+    'Quadrante 2:3': [[2/3, 1, 1/3, 2/3], [2/3, 1, 1/4, 3/5]],
+    'Quadrante 3:1': [[0, 1/3, 2/3, 1], [0, 1/3, 3/5, 1]],
+    'Quadrante 3:2': [[1/3, 2/3, 2/3, 1], [1/3, 2/3, 3/5, 1]],
+    'Quadrante 3:3': [[2/3, 1, 2/3, 1], [2/3, 1, 3/5, 1]]
+}
+
+'''quadrants_dict = {
     'Quadrante 1:1': [[0, 1/3, 0, 1/3],[0, 1/3, 0, 1/3]],
     'Quadrante 1:2': [[1/3, 2/3, 0, 1/3], [1/3, 2/3, 0, 1/3]],
     'Quadrante 1:3': [[2/3, 1, 0, 1/3], [2/3, 1, 0, 1/3]],
@@ -32,12 +44,22 @@ quadrants_dict = {
     'Quadrante 3:1': [[0, 1/3, 2/3, 1], [0, 1/3, 2/3, 1]],
     'Quadrante 3:2': [[1/3, 2/3, 2/3, 1], [1/3, 2/3, 1/2, 1]],
     'Quadrante 3:3': [[2/3, 1, 2/3, 1], [2/3, 1, 2/3, 1]]
-}
+}'''
 
 
 def app():
     st.title("Omografia con linee di Hough")
-
+    
+    st.markdown('''<div text-align="justify"> In questo modulo è stata utilizzata una strategia che prevede l'utilizzo della trasformata di Hough.
+    E’ una tecnica che permette di riconoscere particolari configurazioni di punti presenti nell’immagine, come segmenti, curve o altre forme prefissate.
+    Il principio fondamentale è che la forma cercata può essere espressa tramite una funzione nota che fa uso di un insieme di parametri. </div>
+    <br> 
+    <div text-align="justify"> Nel caso del nostro progetto, l'obiettivo è quello di sfruttare la trasformata per ottenere delle linee le cui intersezioni restituiscono
+    dei punti candidati ad essere utilizzati per il calcolo dell'omografia. 
+    </div>
+    ''', unsafe_allow_html=True)
+    st.markdown("---")
+    st.markdown("## <b>Applicazione</b>", unsafe_allow_html= True)
     st.subheader("Linee di Hough su Immagine di Destination")
     dst = cv2.imread(PATH_IMGS + 'dst.jpg', cv2.IMREAD_COLOR)
     dst_copy = dst.copy() 
@@ -52,6 +74,7 @@ def app():
         st.image(dst_copy, channels="BGR")
         color_single_pixel(dst, points)
         cv2.imwrite(PATH_IMGS + 'final_dst.png', dst)
+        st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni, potrebbe rilanciare un'eccezione se queste non vengono trovate")
         
 
 
@@ -69,8 +92,21 @@ def app():
         st.image(src_copy, channels="BGR")
         color_single_pixel(src, src_points)
         cv2.imwrite(PATH_IMGS + 'final_src.png', src)
-       
+        st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni, potrebbe rilanciare un'eccezione se queste non vengono trovate")
 
+
+
+    st.subheader("Divisione immagini in griglie")   
+    st.markdown('''
+    <div text-align="justify"> Come è possibile notare dai risultati ottenuti, è molto difficile riuscire ad ottenere gli stessi punti su entrambe le immagini.
+    Anche nel caso in cui si trovino punti in comune,  si avrebbe un numero di punti differenti tra le due immagini, rendendo impossibile il matching tra di essi. 
+    Quindi, la strategia adottata è quella di dividere le immagini in 9 settori mediante una griglia, analizzare un settore per volta e scegliere per ognuno di essi un punto trovato mediante euristica 
+    </div> <br>
+    ''', unsafe_allow_html= True)
+
+    grid_src = cv2.imread(PATH_IMGS + "src_grid.jpg")
+    grid_dst = cv2.imread(PATH_IMGS + "dst_grid.jpg")
+    
 
     image1 = PIL.Image.open(PATH_IMGS + "final_dst.png")
     image2 = PIL.Image.open(PATH_IMGS + "final_src.png")
@@ -84,28 +120,24 @@ def app():
     points_img1 = []
     points_img2 = []
 
-    col1, col2 = st.columns(2)
-
     for list_value in quadrants_dict.values():
         par_img1 = list_value[0]
-        par_img2 = list_value[1]
-
-        
-        col1.image(image1.crop((int(x * par_img1[0]), int(y* par_img1[2]), int(x*par_img1[1]), int(y*par_img1[3]))), channels = "BGR")
-        col2.image(image2.crop((int(x1 * par_img2[0]), int(y1* par_img2[2]), int(x1*par_img2[1]), int(y1*par_img2[3]))), channels = "BGR")
+        par_img2 = list_value[1]  
         p_im1 = find_points(image1, int(x * par_img1[0]), int(x*par_img1[1]), int(y* par_img1[2]), int(y*par_img1[3]))
         p_im2 = find_points(image2, int(x1 * par_img2[0]), int(x1*par_img2[1]), int(y1* par_img2[2]), int(y1*par_img2[3]))
+        #col1.image(image1.crop((int(x * par_img1[0]), int(y* par_img1[2]), int(x*par_img1[1]), int(y*par_img1[3]))), channels = "BGR")
+        #col2.image(image2.crop((int(x1 * par_img2[0]), int(y1* par_img2[2]), int(x1*par_img2[1]), int(y1*par_img2[3]))), channels = "BGR")
         if p_im1 != None and p_im2 != None:
             print(int(p_im1[0]))
-            cv2.circle(dst, (int(p_im1[0]), int(p_im1[1])), 1, (0,0,255), 10)
-            cv2.circle(src, (int(p_im2[0]), int(p_im2[1])), 1, (0,0,255), 10)
+            cv2.circle(grid_dst, (int(p_im1[0]), int(p_im1[1])), 1, (255,127,0), 12)
+            cv2.circle(grid_src, (int(p_im2[0]), int(p_im2[1])), 1, (255,127,0), 12)
             points_img1.append(p_im1)
             points_img2.append(p_im2)
     print(f'Points Image 1: {points_img1} \n Length: {len(points_img1)}')
     print(f'Points Image 2: {points_img2} \n Length: {len(points_img2)}')
     
-    st.image(dst, channels="BGR")
-    st.image(src, channels="BGR")
+    st.image(grid_src, channels = "BGR")
+    st.image(grid_dst, channels = "BGR")
 
     
     scelta = st.radio("Utilizzo del RANSAC per gli outliers", ['Si', 'No'], index=1)
@@ -212,7 +244,7 @@ def find_points(img, x1, x2, y1, y2):
     for x in range(x1, x2):
       rgb_pixel_value = img.getpixel((x, y))
       if rgb_pixel_value == (0, 255, 0):
-      #print(str(x) + "," + str(y))
+        #print(str(x) + "," + str(y))
         points.append([x, y])
   print(points)
   if len(points) == 0:
