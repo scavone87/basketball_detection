@@ -75,12 +75,14 @@ def app():
         minLineLength=st.slider("Min Line Length", min_value=10, max_value=400, value=50, step=5)
         maxLineGap=st.slider("Max Line Gap", min_value=10, max_value=400, value=40, step=5)
         st.form_submit_button(label='Calcola')
-        points = draw_lines_p(dst_copy, 1, np.pi/180, threshold=threshold, min_line_length=minLineLength, max_line_gap=maxLineGap)
-        draw_points(dst_copy, points)
-        st.image(dst_copy, channels="BGR")
-        color_single_pixel(dst, points)
-        cv2.imwrite(PATH_IMGS + 'final_dst.png', dst)
         st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe rilanciare un'eccezione se queste non vengono trovate")
+
+  
+    points = draw_lines_p(dst_copy, 1, np.pi/180, threshold=threshold, min_line_length=minLineLength, max_line_gap=maxLineGap)
+    draw_points(dst_copy, points)
+    st.image(dst_copy, channels="BGR")
+    color_single_pixel(dst, points)
+    cv2.imwrite(PATH_IMGS + 'final_dst.png', dst)
         
 
 
@@ -88,19 +90,19 @@ def app():
     
     with st.form(key='hough_src'):
         scelta = st.selectbox("Scegli un'immagine", images_dict.keys())
-        src = cv2.imread(images_dict[scelta], cv2.IMREAD_COLOR)
-        src_copy = src.copy() 
         threshold= st.slider("Threshold", min_value=10, max_value=400, value=150, step=5, key="t2")
         minLineLength=st.slider("Min Line Length", min_value=10, max_value=400, value=50, step=5, key="min2")
         maxLineGap=st.slider("Max Line Gap", min_value=10, max_value=400, value=40, step=5, key="max2")
         st.form_submit_button(label='Calcola')
-        src_points = draw_lines_p(src_copy, 1, np.pi/180, threshold=threshold, min_line_length=minLineLength, max_line_gap=maxLineGap)
-        draw_points(src_copy, src_points)
-        st.image(src_copy, channels="BGR")
-        color_single_pixel(src, src_points)
-        cv2.imwrite(PATH_IMGS + 'final_src.png', src)
         st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe rilanciare un'eccezione se queste non vengono trovate")
 
+    src = cv2.imread(images_dict[scelta], cv2.IMREAD_COLOR)
+    src_copy = src.copy() 
+    src_points = draw_lines_p(src_copy, 1, np.pi/180, threshold=threshold, min_line_length=minLineLength, max_line_gap=maxLineGap)
+    draw_points(src_copy, src_points)
+    st.image(src_copy, channels="BGR")
+    color_single_pixel(src, src_points)
+    cv2.imwrite(PATH_IMGS + 'final_src.png', src)
 
 
     st.subheader("Divisione immagini in griglie")   
@@ -134,7 +136,6 @@ def app():
         p_im1 = find_points(image1, int(x * par_img1[0]), int(x*par_img1[1]), int(y* par_img1[2]), int(y*par_img1[3]))
         p_im2 = find_points(image2, int(x1 * par_img2[0]), int(x1*par_img2[1]), int(y1* par_img2[2]), int(y1*par_img2[3]))
         if p_im1 != None and p_im2 != None:
-            print(int(p_im1[0]))
             cv2.circle(grid_dst, (int(p_im1[0]), int(p_im1[1])), 1, (255,127,0), 12)
             cv2.circle(grid_src, (int(p_im2[0]), int(p_im2[1])), 1, (255,127,0), 12)
             points_img1.append(p_im1)
