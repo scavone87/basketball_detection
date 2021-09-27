@@ -12,7 +12,7 @@ visual_dict = {
 
 def app():
 
-    st.title("Punti di omografia")
+    st.title("Omografia Manuale")
 
     st.markdown('''<div style="text-align: justify"> Per calcolare la matrice di omografia H è stato utilizzato un approccio manuale. 
     L'obiettivo è quello di ricavare la matrice dalla prima immagine e riutilizzarla per le successive. 
