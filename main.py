@@ -14,7 +14,7 @@ PAGES = {
     "Linee di Hough": hough_lines,
     'Conclusioni': conclusione
 }
-st.set_page_config(page_title='Basketball Detection', page_icon=':basketball:', layout='centered', initial_sidebar_state='auto')
+st.set_page_config(page_title='Basketball Homography', page_icon=':basketball:', layout='centered', initial_sidebar_state='auto')
 st.sidebar.title('Navigazione')
 selection = st.sidebar.radio("vai", list(PAGES.keys()))
 page = PAGES[selection]

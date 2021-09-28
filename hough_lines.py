@@ -90,7 +90,7 @@ def app():
     
     with st.form(key='hough_src'):
         scelta = st.selectbox("Scegli un'immagine", images_dict.keys())
-        threshold= st.slider("Threshold", min_value=10, max_value=400, value=150, step=5, key="t2")
+        threshold= st.slider("Threshold", min_value=10, max_value=400, value=135, step=5, key="t2")
         minLineLength=st.slider("Min Line Length", min_value=10, max_value=400, value=50, step=5, key="min2")
         maxLineGap=st.slider("Max Line Gap", min_value=10, max_value=400, value=40, step=5, key="max2")
         st.form_submit_button(label='Calcola')
