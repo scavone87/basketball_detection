@@ -10,7 +10,9 @@ The project has been realized for the course of Visione e Percezione of the Univ
 ### 2. Run Project
 
 > `streamlit run main.py`
+### 3. If Streamlit is not installed
 
+> `pip install streamlit`
 
 ## Useful Link
 - [Google Colab](https://drive.google.com/drive/u/1/folders/1WRiGmXK0bP9Wff9xNXZKWLPSxFstdyZc)
