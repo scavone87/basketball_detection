@@ -87,7 +87,7 @@ def app():
         minLineLength=st.slider("Min Line Length", min_value=10, max_value=400, value=50, step=5)
         maxLineGap=st.slider("Max Line Gap", min_value=10, max_value=400, value=40, step=5)
         st.form_submit_button(label='Calcola')
-        #st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe rilanciare un'eccezione se queste non vengono trovate")
+        st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe non trovare punti per l'omografia. In tal caso modificare i valori degli sliders.")
 
   
     points = draw_lines_p(dst_copy, 1, np.pi/180, threshold=threshold, min_line_length=minLineLength, max_line_gap=maxLineGap)
@@ -106,7 +106,7 @@ def app():
         minLineLength=st.slider("Min Line Length", min_value=10, max_value=400, value=50, step=5, key="min2")
         maxLineGap=st.slider("Max Line Gap", min_value=10, max_value=400, value=40, step=5, key="max2")
         st.form_submit_button(label='Calcola')
-        #st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe rilanciare un'eccezione se queste non vengono trovate")
+        st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe non trovare punti per l'omografia. In tal caso modificare i valori degli sliders.")
 
     src = cv2.imread(images_dict[scelta], cv2.IMREAD_COLOR)
     src_copy = src.copy() 
@@ -162,8 +162,8 @@ def app():
     
     scelta = st.radio("Utilizzo del RANSAC per gli outliers", ['Si', 'No'], index=1)
 
-    if np.array(points_img1).size == 0 or np.array(points_img2).size == 0:
-      message = "Non esistono punti per l'omografia"
+    if len(points_img1) == 0 or len(points_img2) == 0 or len(points_img1) < 4 or len(points_img2) < 4:
+      message = "Non esistono abbastanza punti per l'omografia"
       st.error(message)
       return
     else:
@@ -222,7 +222,7 @@ def draw_points(img, points):
     intersections = bot.isect_segments(points)
   except AssertionError:
     message = "Nessun punto trovato! Riprovare con altri valori!"
-    st.error(message)
+    print(message)
     return
   try:  
     for idx, inter in enumerate(intersections):
