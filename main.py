@@ -10,7 +10,7 @@ PAGES = {
 	"Introduzione": introduction,
     "Stitching": stitching,
     "Omografia Manuale": homography,
-    "Omografia interattiva": interactive_homography,
+    "Omografia Interattiva": interactive_homography,
     "Linee di Hough": hough_lines,
     'Conclusioni': conclusione
 }

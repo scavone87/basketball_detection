@@ -32,7 +32,7 @@ def app():
     simile se non uguale all'immagine di destinazione.</div> 
     <br>
     <div style="text-align: justify"> Con le immagini <b>Lakers 1</b> e <b>Lakers 2D</b>, utilizzando <b>sift</b> con <b>bf</b> e scegliendo come <b>Reprojection threshold</b> 10
-    si ottiene un buon risultato </div><br>
+    si ottiene un buon risultato. </div><br>
     ''', unsafe_allow_html= True)
 
     current_src = st.selectbox("Seleziona un'immagine di source", src_dict.keys())

@@ -22,7 +22,7 @@ import poly_point_isect as bot
     'Quadrante 3:3': [[2/3, 1, 2/3, 1], [2/3, 1, 1/2, 1]]
 }'''
 
-quadrants_dict = {
+'''quadrants_dict = {
     'Quadrante 1:1': [[0, 1/3, 0, 1/3],[0, 1/3, 0, 1/4]],
     'Quadrante 1:2': [[1/3, 2/3, 0, 1/3], [1/3, 2/3, 0, 1/4]],
     'Quadrante 1:3': [[2/3, 1, 0, 1/3], [2/3, 1, 0, 1/4]],
@@ -32,6 +32,18 @@ quadrants_dict = {
     'Quadrante 3:1': [[0, 1/3, 2/3, 1], [0, 1/3, 3/5, 1]],
     'Quadrante 3:2': [[1/3, 2/3, 2/3, 1], [1/3, 2/3, 3/5, 1]],
     'Quadrante 3:3': [[2/3, 1, 2/3, 1], [2/3, 1, 3/5, 1]]
+}'''
+
+quadrants_dict = {
+    'Quadrante 1:1': [[0, 1/3, 0, 1/3],[0, 1/3, 1/7, 1/3]],
+    'Quadrante 1:2': [[1/3, 2/3, 0, 1/3], [1/3, 2/3, 1/7, 1/3]],
+    'Quadrante 1:3': [[2/3, 1, 0, 1/3], [2/3, 1, 1/7, 1/3]],
+    'Quadrante 2:1': [[0, 1/3, 1/3, 2/3], [0, 1/3, 1/3, 0.55]],
+    'Quadrante 2:2': [[1/3, 2/3, 1/3, 2/3], [1/3, 2/3, 1/3, 0.55]],
+    'Quadrante 2:3': [[2/3, 1, 1/3, 2/3], [2/3, 1, 1/3, 0.55]],
+    'Quadrante 3:1': [[0, 1/3, 2/3, 1], [0, 1/3, 0.55, 0.85]],
+    'Quadrante 3:2': [[1/3, 2/3, 2/3, 1], [1/3, 2/3, 0.55, 0.85]],
+    'Quadrante 3:3': [[2/3, 1, 2/3, 1], [2/3, 1, 0.55, 0.85]]
 }
 
 '''quadrants_dict = {
@@ -75,7 +87,7 @@ def app():
         minLineLength=st.slider("Min Line Length", min_value=10, max_value=400, value=50, step=5)
         maxLineGap=st.slider("Max Line Gap", min_value=10, max_value=400, value=40, step=5)
         st.form_submit_button(label='Calcola')
-        st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe rilanciare un'eccezione se queste non vengono trovate")
+        #st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe rilanciare un'eccezione se queste non vengono trovate")
 
   
     points = draw_lines_p(dst_copy, 1, np.pi/180, threshold=threshold, min_line_length=minLineLength, max_line_gap=maxLineGap)
@@ -94,7 +106,7 @@ def app():
         minLineLength=st.slider("Min Line Length", min_value=10, max_value=400, value=50, step=5, key="min2")
         maxLineGap=st.slider("Max Line Gap", min_value=10, max_value=400, value=40, step=5, key="max2")
         st.form_submit_button(label='Calcola')
-        st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe rilanciare un'eccezione se queste non vengono trovate")
+        #st.markdown("**Nota**: in base ai parametri selezionati, la libreria che consente di ricavare le intersezioni potrebbe rilanciare un'eccezione se queste non vengono trovate")
 
     src = cv2.imread(images_dict[scelta], cv2.IMREAD_COLOR)
     src_copy = src.copy() 
@@ -143,27 +155,32 @@ def app():
     print(f'Points Image 1: {points_img1} \n Length: {len(points_img1)}')
     print(f'Points Image 2: {points_img2} \n Length: {len(points_img2)}')
     
-    st.image(grid_src, channels = "BGR", caption="La griglia è stata costruita in modo da avere rettangoli bassi in alto e rettangoli alti in basso per via della prospettiva")
+    st.image(grid_src, channels = "BGR", caption="La griglia è stata costruita in modo da avere rettangoli bassi in alto e rettangoli alti in basso per via della prospettiva riproducendo quanto più fedelmente quella applicata all'immagine 2D.")
     st.image(grid_dst, channels = "BGR")
 
     st.subheader("Risultato")
     
     scelta = st.radio("Utilizzo del RANSAC per gli outliers", ['Si', 'No'], index=1)
 
-    if scelta == 'Si':
-        reprojThresh = st.slider("Ransac Reprojection threshold", min_value=1.0, max_value=10.0, step=0.5)
-        (H, status) = cv2.findHomography(np.array(points_img2), np.array(points_img1), cv2.RANSAC,reprojThresh)
+    if np.array(points_img1).size == 0 or np.array(points_img2).size == 0:
+      message = "Non esistono punti per l'omografia"
+      st.error(message)
+      return
     else:
-        (H, status) = cv2.findHomography(np.array(points_img2), np.array(points_img1))
-    plan_view = cv2.warpPerspective(src, H, (dst.shape[1], dst.shape[0]))
-    for i in range(0,dst.shape[0]):
-        for j in range(0, dst.shape[1]):
-            if plan_view.item(i,j,0) == 0 and plan_view.item(i,j,1) == 0 and plan_view.item(i,j,2) == 0:
-                plan_view.itemset((i,j,0),dst.item(i,j,0))
-                plan_view.itemset((i,j,1),dst.item(i,j,1))
-                plan_view.itemset((i,j,2),dst.item(i,j,2))
+      if scelta == 'Si':
+          reprojThresh = st.slider("Ransac Reprojection threshold", min_value=1.0, max_value=10.0, step=0.5)
+          (H, status) = cv2.findHomography(np.array(points_img2), np.array(points_img1), cv2.RANSAC,reprojThresh)
+      else:
+          (H, status) = cv2.findHomography(np.array(points_img2), np.array(points_img1))
+      plan_view = cv2.warpPerspective(src, H, (dst.shape[1], dst.shape[0]))
+      for i in range(0,dst.shape[0]):
+          for j in range(0, dst.shape[1]):
+              if plan_view.item(i,j,0) == 0 and plan_view.item(i,j,1) == 0 and plan_view.item(i,j,2) == 0:
+                  plan_view.itemset((i,j,0),dst.item(i,j,0))
+                  plan_view.itemset((i,j,1),dst.item(i,j,1))
+                  plan_view.itemset((i,j,2),dst.item(i,j,2))
 
-    st.image(plan_view, channels="BGR")
+      st.image(plan_view, channels="BGR")
 
 
 
@@ -201,42 +218,57 @@ def draw_lines(img, rho, theta, threshold):
   return points
 
 def draw_points(img, points):
-  intersections = bot.isect_segments(points)
-  for idx, inter in enumerate(intersections):
-    a, b = inter
-    match = 0
-    for other_inter in intersections[idx:]:
-        c, d = other_inter
-        if abs(c-a) < 8 and abs(d-b) < 8:
-            match = 1
-            if other_inter in intersections:
-                intersections.remove(other_inter)
-                intersections[idx] = ((c+a)/2, (d+b)/2)
-    if match == 0:
-        intersections.remove(inter)
-  for inter in intersections:
-    a, b = inter
-    for i in range(6):
-        for j in range(6):
-            img[int(b) + i, int(a) + j] = [0, 255, 0]
+  try:
+    intersections = bot.isect_segments(points)
+  except AssertionError:
+    message = "Nessun punto trovato! Riprovare con altri valori!"
+    st.error(message)
+    return
+  try:  
+    for idx, inter in enumerate(intersections):
+      a, b = inter
+      match = 0
+      for other_inter in intersections[idx:]:
+          c, d = other_inter
+          if abs(c-a) < 8 and abs(d-b) < 8:
+              match = 1
+              if other_inter in intersections:
+                  intersections.remove(other_inter)
+                  intersections[idx] = ((c+a)/2, (d+b)/2)
+      if match == 0:
+          intersections.remove(inter)
+    for inter in intersections:
+      a, b = inter
+      for i in range(6):
+          for j in range(6):
+              img[int(b) + i, int(a) + j] = [0, 255, 0]
+  except IndexError:
+    pass  
 
 def color_single_pixel(img, points):
-  intersections = bot.isect_segments(points)
-  for idx, inter in enumerate(intersections):
-    a, b = inter
-    match = 0
-    for other_inter in intersections[idx:]:
-        c, d = other_inter
-        if abs(c-a) < 8 and abs(d-b) < 8:
-            match = 1
-            if other_inter in intersections:
-                intersections.remove(other_inter)
-                intersections[idx] = ((c+a)/2, (d+b)/2)
-    if match == 0:
-        intersections.remove(inter)
-  for inter in intersections:
-    a, b = inter
-    img[int(b), int(a)] = [0, 255, 0]
+  try:
+    intersections = bot.isect_segments(points)
+  except AssertionError:
+    message = "ERRORE!"
+    return
+  try:  
+    for idx, inter in enumerate(intersections):
+      a, b = inter
+      match = 0
+      for other_inter in intersections[idx:]:
+          c, d = other_inter
+          if abs(c-a) < 8 and abs(d-b) < 8:
+              match = 1
+              if other_inter in intersections:
+                  intersections.remove(other_inter)
+                  intersections[idx] = ((c+a)/2, (d+b)/2)
+      if match == 0:
+          intersections.remove(inter)
+    for inter in intersections:
+      a, b = inter
+      img[int(b), int(a)] = [0, 255, 0]
+  except IndexError:
+    pass  
 
 def mean(points):
   x = points[:, 0].mean()
@@ -264,10 +296,22 @@ def draw_grid(img):
   width = img.shape[1]
   height = img.shape[0]
   for x in range(0, width, int(width/3)):
+    cv2.line(img, (x, int(height/7)), (x, int(height*0.85)), (0, 255, 0), thickness=  3)
+  cv2.line(img, (0,int(height/7)), (width, int(height/7)),(0, 255, 0), thickness = 3)
+  cv2.line(img, (0,height), (width, height),(0, 255, 0), thickness=  3)
+  cv2.line(img, (0, int(height/3)), (width, int(height/3)),(0, 255, 0), thickness=  3)
+  cv2.line(img, (0, int(height*0.55)), (width, int(height*0.55)),(0, 255, 0), thickness=  3)
+  cv2.line(img, (0, int(height*0.85)), (width, int(height*0.85)),(0, 255, 0), thickness=  3)
+  return img
+
+  """def draw_grid(img):
+  width = img.shape[1]
+  height = img.shape[0]
+  for x in range(0, width, int(width/3)):
     cv2.line(img, (x, 0), (x, height), (0, 255, 0), thickness=  3)
   cv2.line(img, (0,0), (width, 0),(0, 255, 0), thickness = 3)
   cv2.line(img, (0,height), (width, height),(0, 255, 0), thickness=  3)
   cv2.line(img, (0, int(height/4)), (width, int(height/4)),(0, 255, 0), thickness=  3)
   cv2.line(img, (0, int(height*3/5)), (width, int(height*3/5)),(0, 255, 0), thickness=  3)
   cv2.line(img, (0, height), (width, height),(0, 255, 0), thickness=  3)
-  return img
+  return img"""
