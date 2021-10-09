@@ -298,7 +298,7 @@ def draw_grid(img):
   for x in range(0, width, int(width/3)):
     cv2.line(img, (x, int(height/7)), (x, int(height*0.85)), (0, 255, 0), thickness=  3)
   cv2.line(img, (0,int(height/7)), (width, int(height/7)),(0, 255, 0), thickness = 3)
-  cv2.line(img, (0,height), (width, height),(0, 255, 0), thickness=  3)
+  #cv2.line(img, (0,height), (width, height),(0, 255, 0), thickness=  3)
   cv2.line(img, (0, int(height/3)), (width, int(height/3)),(0, 255, 0), thickness=  3)
   cv2.line(img, (0, int(height*0.55)), (width, int(height*0.55)),(0, 255, 0), thickness=  3)
   cv2.line(img, (0, int(height*0.85)), (width, int(height*0.85)),(0, 255, 0), thickness=  3)
