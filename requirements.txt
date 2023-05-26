@@ -1,5 +1,5 @@
 imutils==0.5.4
-ipython==8.13.2
+ipython==7.34.0
 isect-segments-bentley-ottmann @ git+https://github.com/ideasman42/isect_segments-bentley_ottmann.git@19deb3c5be4c2b91689b87548a875054b43e9952
 opencv-python==4.7.0.72
 scikit-image==0.18.3
