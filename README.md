@@ -9,7 +9,7 @@ The project has been realized for the course of Visione e Percezione of the Univ
 
 ### 2. Run Project
 
-> `streamlit run main.py`
+> `streamlit run _🎈_introduzione.py`
 ### 3. If Streamlit is not installed
 
 > `pip install streamlit`
