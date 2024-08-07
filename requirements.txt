@@ -4,3 +4,4 @@ isect-segments-bentley-ottmann @ git+https://github.com/ideasman42/isect_segment
 opencv-python-headless==4.7.0.72
 scikit-image==0.18.3
 streamlit==1.22.0
+numpy<2 
